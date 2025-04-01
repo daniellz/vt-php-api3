@@ -53,7 +53,7 @@ class BaseClient
      * @param string $apiKey
      * @param ClientInterface|null $client
      */
-    public function __construct(string $apiKey, ClientInterface $client = null)
+    public function __construct(string $apiKey, ?ClientInterface $client = null)
     {
         $this->_apiKey =  $apiKey;
 
@@ -220,11 +220,9 @@ class BaseClient
             throw new NotAvailableYetException($error["message"]);
         }
 
-        $exceptionClass = '\\Exceptions\\'.str_replace("Error", "Exception", $error["code"]);
-
-        if(file_exists(__dir__.$exceptionClass.'.php')) {
-            $exceptionClassWithNamespace = __NAMESPACE__ . $exceptionClass;
-            throw new $exceptionClassWithNamespace($error["message"]);
+        $className = __NAMESPACE__ . '\\Exceptions\\' . str_replace('Error', 'Exception', $error['code']);
+        if (class_exists($className)) {
+            throw new $className($error["message"]);
         }
 
         throw new MalformedResponseException();
